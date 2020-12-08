@@ -10,32 +10,25 @@
 		private GraphicsDeviceManager _graphics;
 		private SpriteBatch _spriteBatch;
 		private Texture2D _renderTarget;
-		private Memory _memory;
-		private Color[] _pallete;
+		private Memory _mem;
 
 		public FC360Game()
 		{
 			_graphics = new GraphicsDeviceManager(this);
 			Content.RootDirectory = "Content";
 			IsMouseVisible = true;
-			_memory = new Memory();
-			_pallete = new Color[]
-			{
-				Color.Black,
-				Color.Gray,
-				Color.White
-			};
+			_mem = new Memory();
 		}
 
 		protected override void Initialize()
 		{
 			base.Initialize();
 			_renderTarget = new Texture2D(GraphicsDevice,
-				_memory.DisplayBuffer.Width,
-				_memory.DisplayBuffer.Height);
+				_mem.DisplayBuffer.Width,
+				_mem.DisplayBuffer.Height);
 
-			_memory.DisplayBuffer[20, 20] = 1;
-			_memory.DisplayBuffer[10, 10] = 2;
+			_mem.DisplayBuffer[20, 20] = 7;
+			_mem.DisplayBuffer[10, 10] = 15;
 		}
 
 		protected override void LoadContent()
@@ -57,11 +50,12 @@
 
 			var width = _renderTarget.Width;
 			var pixelData = new Color[width * _renderTarget.Height];
-			for (var y = 0; y < _memory.DisplayBuffer.Height; y++)
+			for (var y = 0; y < _mem.DisplayBuffer.Height; y++)
 			{ 
-				for (var x = 0; x < _memory.DisplayBuffer.Width; x++)
+				for (var x = 0; x < _mem.DisplayBuffer.Width; x++)
 				{
-					pixelData[x + (y * width)] = _pallete[_memory.DisplayBuffer[x, y] % _pallete.Length];
+					var c = _mem.Pallete[_mem.DisplayBuffer[x, y]];
+					pixelData[x + (y * width)] = new Color(c.R, c.G, c.B);
 				}
 			}
 			_renderTarget.SetData(pixelData);
