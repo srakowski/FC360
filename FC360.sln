@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30717.126
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FC360", "FC360\FC360.csproj", "{A40D45D6-D3C8-4738-B93A-6F8378ADFF80}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FC360.Core", "FC360.Core\FC360.Core.csproj", "{3CDE0DEA-5C10-4A41-9D01-56C884537579}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A40D45D6-D3C8-4738-B93A-6F8378ADFF80}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A40D45D6-D3C8-4738-B93A-6F8378ADFF80}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A40D45D6-D3C8-4738-B93A-6F8378ADFF80}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A40D45D6-D3C8-4738-B93A-6F8378ADFF80}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3CDE0DEA-5C10-4A41-9D01-56C884537579}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3CDE0DEA-5C10-4A41-9D01-56C884537579}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3CDE0DEA-5C10-4A41-9D01-56C884537579}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3CDE0DEA-5C10-4A41-9D01-56C884537579}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B7238E83-8E27-4E51-BF9C-BDFCEDBA39BD}
+	EndGlobalSection
+EndGlobal
