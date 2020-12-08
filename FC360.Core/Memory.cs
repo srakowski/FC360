@@ -2,10 +2,10 @@
 {
 	public class Memory
 	{
-		public Memory()
+		public Memory(int width, int height)
 		{
 			Pallete = new Pallete();
-			DisplayBuffer = new DisplayBuffer(256, 224);
+			DisplayBuffer = new DisplayBuffer(width, height);
 		}
 
 		public Pallete Pallete { get; }

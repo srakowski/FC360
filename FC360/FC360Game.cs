@@ -7,9 +7,13 @@
 
 	public class FC360Game : Game
 	{
+		private const int DisplayWidth = 256;
+		private const int DisplayHeight = 224;
+
 		private GraphicsDeviceManager _graphics;
 		private SpriteBatch _spriteBatch;
 		private Texture2D _renderTarget;
+		private Color[] _pixelData;
 		private Memory _mem;
 		private ViewportAdapter _vpa;
 
@@ -19,12 +23,13 @@
 			Window.AllowUserResizing = true;
 			Content.RootDirectory = "Content";
 			IsMouseVisible = true;
-			_mem = new Memory();
 		}
 
 		protected override void Initialize()
 		{
 			base.Initialize();
+
+			_mem = new Memory(DisplayWidth, DisplayHeight);
 
 			_vpa = new ViewportAdapter(
 				Window,
@@ -36,6 +41,9 @@
 				_mem.DisplayBuffer.Width,
 				_mem.DisplayBuffer.Height);
 
+			_pixelData = new Color[_mem.DisplayBuffer.Width * _mem.DisplayBuffer.Height];
+
+			// Testing implementation, TODO: delete
 			_mem.DisplayBuffer[20, 20] = 7;
 			_mem.DisplayBuffer[10, 10] = 15;
 		}
@@ -57,17 +65,16 @@
 		{
 			GraphicsDevice.Clear(Color.Black);
 
-			var width = _renderTarget.Width;
-			var pixelData = new Color[width * _renderTarget.Height];
+			var width = _mem.DisplayBuffer.Width;
 			for (var y = 0; y < _mem.DisplayBuffer.Height; y++)
 			{ 
-				for (var x = 0; x < _mem.DisplayBuffer.Width; x++)
+				for (var x = 0; x < width; x++)
 				{
 					var c = _mem.Pallete[_mem.DisplayBuffer[x, y]];
-					pixelData[x + (y * width)] = new Color(c.R, c.G, c.B);
+					_pixelData[x + (y * width)] = new Color(c.R, c.G, c.B);
 				}
 			}
-			_renderTarget.SetData(pixelData);
+			_renderTarget.SetData(_pixelData);
 
 			_vpa.Reset();
 			_spriteBatch.Begin(transformMatrix: _vpa.GetScaleMatrix(), samplerState: SamplerState.PointClamp);
