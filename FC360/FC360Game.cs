@@ -11,10 +11,12 @@
 		private SpriteBatch _spriteBatch;
 		private Texture2D _renderTarget;
 		private Memory _mem;
+		private ViewportAdapter _vpa;
 
 		public FC360Game()
 		{
 			_graphics = new GraphicsDeviceManager(this);
+			Window.AllowUserResizing = true;
 			Content.RootDirectory = "Content";
 			IsMouseVisible = true;
 			_mem = new Memory();
@@ -23,6 +25,13 @@
 		protected override void Initialize()
 		{
 			base.Initialize();
+
+			_vpa = new ViewportAdapter(
+				Window,
+				GraphicsDevice,
+				_mem.DisplayBuffer.Width,
+				_mem.DisplayBuffer.Height);
+
 			_renderTarget = new Texture2D(GraphicsDevice,
 				_mem.DisplayBuffer.Width,
 				_mem.DisplayBuffer.Height);
@@ -46,7 +55,7 @@
 
 		protected override void Draw(GameTime gameTime)
 		{
-			GraphicsDevice.Clear(Color.CornflowerBlue);
+			GraphicsDevice.Clear(Color.Black);
 
 			var width = _renderTarget.Width;
 			var pixelData = new Color[width * _renderTarget.Height];
@@ -60,7 +69,8 @@
 			}
 			_renderTarget.SetData(pixelData);
 
-			_spriteBatch.Begin();
+			_vpa.Reset();
+			_spriteBatch.Begin(transformMatrix: _vpa.GetScaleMatrix(), samplerState: SamplerState.PointClamp);
 			_spriteBatch.Draw(_renderTarget, Vector2.Zero, Color.White);
 			_spriteBatch.End();
 		}
