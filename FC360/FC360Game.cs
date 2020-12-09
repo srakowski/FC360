@@ -7,14 +7,11 @@
 
 	public class FC360Game : Game
 	{
-		private const int DisplayWidth = 256;
-		private const int DisplayHeight = 224;
-
 		private GraphicsDeviceManager _graphics;
 		private SpriteBatch _spriteBatch;
 		private Texture2D _renderTarget;
 		private Color[] _pixelData;
-		private Memory _mem;
+		private FantasyConsole _fc;
 		private ViewportAdapter _vpa;
 
 		public FC360Game()
@@ -29,23 +26,39 @@
 		{
 			base.Initialize();
 
-			_mem = new Memory(DisplayWidth, DisplayHeight);
+			_fc = new FantasyConsole();
+			_fc.PowerOn();
 
 			_vpa = new ViewportAdapter(
 				Window,
 				GraphicsDevice,
-				_mem.DisplayBuffer.Width,
-				_mem.DisplayBuffer.Height);
+				_fc.Mem.DisplayBuffer.Width,
+				_fc.Mem.DisplayBuffer.Height);
 
 			_renderTarget = new Texture2D(GraphicsDevice,
-				_mem.DisplayBuffer.Width,
-				_mem.DisplayBuffer.Height);
+				_fc.Mem.DisplayBuffer.Width,
+				_fc.Mem.DisplayBuffer.Height);
 
-			_pixelData = new Color[_mem.DisplayBuffer.Width * _mem.DisplayBuffer.Height];
+			_pixelData = new Color[_fc.Mem.DisplayBuffer.Width * _fc.Mem.DisplayBuffer.Height];
+
+			var text = "Hello World!";
+			for (var i = 0; i < text.Length; i++)
+			{
+				_fc.Mem.TextBuffer[i, 0] = new CharCell(text[i], CharCellFlag.Invert);
+			}
 
 			// Testing implementation, TODO: delete
-			_mem.DisplayBuffer[20, 20] = 7;
-			_mem.DisplayBuffer[10, 10] = 15;
+			//_fc.Mem.DisplayBuffer[20, 20] = 7;
+			//_fc.Mem.DisplayBuffer[10, 10] = 15;
+
+			//			var engine = Python.CreateEngine();
+			//			var scope = engine.CreateScope();
+			//			engine.Execute(
+			//@"def Init(val):
+			//	print 'Hello World!' + str(val)
+			//", scope);
+			//			var init = scope.GetVariable("Init");
+			//			init(10);
 		}
 
 		protected override void LoadContent()
@@ -58,19 +71,19 @@
 			if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
 				Exit();
 
-			base.Update(gameTime);
+			_fc.Tick(gameTime.ElapsedGameTime.TotalMilliseconds);
 		}
 
 		protected override void Draw(GameTime gameTime)
 		{
 			GraphicsDevice.Clear(Color.Black);
 
-			var width = _mem.DisplayBuffer.Width;
-			for (var y = 0; y < _mem.DisplayBuffer.Height; y++)
+			var width = _fc.Mem.DisplayBuffer.Width;
+			for (var y = 0; y < _fc.Mem.DisplayBuffer.Height; y++)
 			{ 
 				for (var x = 0; x < width; x++)
 				{
-					var c = _mem.Pallete[_mem.DisplayBuffer[x, y]];
+					var c = _fc.Mem.Pallete[_fc.Mem.DisplayBuffer[x, y]];
 					_pixelData[x + (y * width)] = new Color(c.R, c.G, c.B);
 				}
 			}
