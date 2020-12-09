@@ -7,12 +7,14 @@ namespace FC360.Core
 		private const int DisplayWidth = 192;
 		private const int DisplayHeight = 128;
 
+		private SysApi _api;
 		private Program _program;
 
 		public FantasyConsole()
 		{
-			_program = new Programs.OperatingSystem();
 			Mem = new Memory(DisplayWidth, DisplayHeight);
+			_api = new SysApi(this);
+			_program = new Programs.OperatingSystem(_api);
 		}
 
 		public Memory Mem { get; }

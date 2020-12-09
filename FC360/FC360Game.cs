@@ -41,12 +41,6 @@
 
 			_pixelData = new Color[_fc.Mem.DisplayBuffer.Width * _fc.Mem.DisplayBuffer.Height];
 
-			var text = "Hello World!";
-			for (var i = 0; i < text.Length; i++)
-			{
-				_fc.Mem.TextBuffer[i, 0] = new CharCell(text[i], CharCellFlag.Invert);
-			}
-
 			// Testing implementation, TODO: delete
 			//_fc.Mem.DisplayBuffer[20, 20] = 7;
 			//_fc.Mem.DisplayBuffer[10, 10] = 15;
@@ -76,7 +70,7 @@
 
 		protected override void Draw(GameTime gameTime)
 		{
-			GraphicsDevice.Clear(Color.Black);
+			GraphicsDevice.Clear(Color.CornflowerBlue);
 
 			var width = _fc.Mem.DisplayBuffer.Width;
 			for (var y = 0; y < _fc.Mem.DisplayBuffer.Height; y++)
