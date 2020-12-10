@@ -1,5 +1,6 @@
 ﻿namespace FC360.Core
 {
+	using FC360.Core.Drivers;
 	using System.Collections.Generic;
 
 	public class FantasyConsole
@@ -7,13 +8,13 @@
 		private const int DisplayWidth = 192;
 		private const int DisplayHeight = 128;
 
-		private SysApi _api;
+		private SysDriver _sys;
 		private Stack<Program> _programStack;
 
 		public FantasyConsole()
 		{
 			Mem = new Memory(DisplayWidth, DisplayHeight);
-			_api = new SysApi(this);
+			_sys = new SysDriver(this);
 			_programStack = new Stack<Program>();
 		}
 
@@ -21,7 +22,7 @@
 
 		public void PowerOn()
 		{
-			PushProgram(new Programs.RootMenu(_api));
+			PushProgram(new Programs.Boot(_sys));
 		}
 
 		internal void PushProgram(Program prog)
@@ -30,11 +31,19 @@
 			prog.Init();
 		}
 
+		internal void PopProgram()
+		{
+			_programStack.Pop();
+		}
+
 		public void Tick(double deltaInMS)
 		{
-			// TODO: maybe not Peek() every time
+			_sys.Update(deltaInMS);
+
+			// TODO: maybe not Peek() every time, store current prog?
 			_programStack.Peek().Update(deltaInMS);
 			_programStack.Peek().Draw();
+
 			if (Mem.DisplayMode == DisplayMode.Text)
 			{
 				CopyTextToDisplayBuffer();

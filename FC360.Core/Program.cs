@@ -1,13 +1,15 @@
 ﻿namespace FC360.Core
 {
+	using FC360.Core.Drivers;
+
 	public abstract class Program
 	{
-		public Program(SysApi api)
+		public Program(SysDriver api)
 		{
-			Api = api;
+			Sys = api;
 		}
 
-		protected SysApi Api { get; }
+		protected SysDriver Sys { get; }
 
 		public virtual void Init() { }
 

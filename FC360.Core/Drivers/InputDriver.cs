@@ -1,12 +1,12 @@
-﻿namespace FC360.Core
+﻿namespace FC360.Core.Drivers
 {
 	using System.Collections.Generic;
 
-	public class InputApi
+	public class InputDriver : Driver
 	{
 		private readonly InputBuffer _inputBuffer;
 
-		public InputApi(InputBuffer inputBuffer)
+		public InputDriver(InputBuffer inputBuffer)
 		{
 			_inputBuffer = inputBuffer;
 		}

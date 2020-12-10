@@ -1,10 +1,10 @@
-﻿namespace FC360.Core
+﻿namespace FC360.Core.Drivers
 {
-	public class TextApi
+	public class ConsoleDriver : Driver
 	{
 		private TextBuffer _textBuffer;
 
-		public TextApi(TextBuffer textBuffer)
+		public ConsoleDriver(TextBuffer textBuffer)
 		{
 			_textBuffer = textBuffer;
 		}

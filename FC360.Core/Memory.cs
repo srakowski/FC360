@@ -14,6 +14,8 @@
 
 			SpriteBuffer = new SpriteBuffer();
 			CodeBuffer = new CodeBuffer();
+
+			FileSystemBuffer = new FileSystemBuffer();
 		}
 
 		// GRAPHICS
@@ -38,6 +40,7 @@
 
 		// GAME
 
+		// TODO: convert to "interrupt" code
 		public bool EditMode { get; set; }
 
 		public string ActiveGame { get; set; }
@@ -45,5 +48,9 @@
 		public SpriteBuffer SpriteBuffer { get; }
 
 		public CodeBuffer CodeBuffer { get; }
+
+		// FILE SYSTEM
+
+		public FileSystemBuffer FileSystemBuffer { get; }
 	}
 }

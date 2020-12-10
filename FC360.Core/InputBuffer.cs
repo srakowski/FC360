@@ -1,17 +1,17 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Text;
-
-namespace FC360.Core
+﻿namespace FC360.Core
 {
+	using System;
+	using System.Collections;
+	using System.Collections.Generic;
+
 	public enum Button : byte
 	{
 		Up,
 		Down,
 		Left,
 		Right,
-		Enter
+		Enter,
+		Escape
 	}
 
 	public enum ButtonState : byte
@@ -32,7 +32,8 @@ namespace FC360.Core
 			ButtonState down,
 			ButtonState left,
 			ButtonState right,
-			ButtonState enter)
+			ButtonState enter,
+			ButtonState escape)
 		{
 			_buttonStates = new ButtonState[Enum.GetValues(typeof(Button)).Length];
 			_buttonStates[(int)Button.Up] = up;
@@ -40,6 +41,7 @@ namespace FC360.Core
 			_buttonStates[(int)Button.Left] = left;
 			_buttonStates[(int)Button.Right] = right;
 			_buttonStates[(int)Button.Enter] = enter;
+			_buttonStates[(int)Button.Escape] = escape;
 		}
 
 		public ButtonState this[Button button] => GetButtonState(button);

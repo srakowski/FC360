@@ -1,6 +1,7 @@
-﻿namespace FC360.Core
+﻿namespace FC360.Core.Drivers
 {
 	using System.Collections.Generic;
+	using System.Linq;
 
 	public struct MenuSelection
 	{
@@ -37,7 +38,7 @@
 		{
 			Title = title;
 			_menuOptions = menuOptions;
-			_selectedOptionIdx = 0;
+			_selectedOptionIdx = _menuOptions.Any() ? 0 : -1;
 		}
 
 		public string Title { get; }
@@ -50,12 +51,18 @@
 
 		internal void SelectUp()
 		{
+			if (_selectedOptionIdx < 0)
+				return;
+
 			_selectedOptionIdx--;
 			_selectedOptionIdx = _selectedOptionIdx < 0 ? _menuOptions.Length - 1 : _selectedOptionIdx;
 		}
 
 		internal void SelectDown()
 		{
+			if (_selectedOptionIdx < 0)
+				return;
+
 			_selectedOptionIdx++;
 			_selectedOptionIdx %= _menuOptions.Length;
 		}
@@ -94,12 +101,12 @@
 		}
 	}
 
-	public class MenuApi
+	public class MenuDriver : Driver
 	{
-		private readonly InputApi _inputApi;
-		private readonly TextApi _textApi;
+		private readonly InputDriver _inputApi;
+		private readonly ConsoleDriver _textApi;
 
-		public MenuApi(InputApi inputApi, TextApi textApi)
+		public MenuDriver(InputDriver inputApi, ConsoleDriver textApi)
 		{
 			_inputApi = inputApi;
 			_textApi = textApi;
@@ -125,7 +132,9 @@
 				menu.SelectedTab.SelectDown();
 			}
 
-			if (_inputApi.ButtonWasPressed(Button.Enter))
+			if (_inputApi.ButtonWasPressed(Button.Enter) &&
+				menu.SelectedTabIdx >= 0 &&
+				menu.SelectedTab.SelectedMenuOptionIdx >= 0)
 			{
 				return new MenuSelection(
 					menu.SelectedTabIdx,
@@ -146,14 +155,17 @@
 			var cursorX = 0;
 			var cursorY = 1;
 
-			foreach (var tab in menu.Tabs)
+			if (menu.Tabs.Count() > 1)
 			{
-				_textApi.Output(cursorX, cursorY, tab.Title, tab == menu.SelectedTab);
-				cursorX += tab.Title.Length + 1;
-			}
+				foreach (var tab in menu.Tabs)
+				{
+					_textApi.Output(cursorX, cursorY, tab.Title, tab == menu.SelectedTab);
+					cursorX += tab.Title.Length + 1;
+				}
 
-			cursorX = 0;
-			cursorY++;
+				cursorX = 0;
+				cursorY++;
+			}
 
 			var i = 0; 
 			foreach (var menuOption in menu.SelectedTab.MenuOptions)

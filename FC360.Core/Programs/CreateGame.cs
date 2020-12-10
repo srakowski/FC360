@@ -1,19 +1,19 @@
-﻿using System.Diagnostics;
-using System.Text;
-
-namespace FC360.Core.Programs
+﻿namespace FC360.Core.Programs
 {
+	using FC360.Core.Drivers;
+	using System.Text;
+
 	class CreateGame : Program
 	{
 		private StringBuilder _nameBuffer = new StringBuilder();
 
-		public CreateGame(SysApi api) : base(api)
+		public CreateGame(SysDriver api) : base(api)
 		{
 		}
 
 		public override void Update(double deltaInMS)
 		{
-			foreach (var c in Api.Input.GetTextInput())
+			foreach (var c in Sys.Input.GetTextInput())
 			{
 				switch (c)
 				{
@@ -41,18 +41,19 @@ namespace FC360.Core.Programs
 
 		private void CreateGameWithName(string gameName)
 		{
-			Api.LoadGame(gameName);
-			Api.Run(new EditGame(Api));
+			Sys.LoadGame(gameName);
+			Sys.ExitProgram();
+			Sys.RunProgram(new GameMenu(Sys, InitialGameMode.Edit));
 		}
 
 		public override void Draw()
 		{
-			Api.Text.Clear();
-			Api.Text.Output(0, 0, "CREATE GAME");
-			Api.Text.InvertRange(0, 0, Api.Text.BufferWidth, 1);
+			Sys.Console.Clear();
+			Sys.Console.Output(0, 0, "CREATE GAME");
+			Sys.Console.InvertRange(0, 0, Sys.Console.BufferWidth, 1);
 			var val = $"NAME={_nameBuffer}";
-			Api.Text.Output(0, 1, val);
-			Api.Text.InvertRange(val.Length, 1, 1, 1);
+			Sys.Console.Output(0, 1, val);
+			Sys.Console.InvertRange(val.Length, 1, 1, 1);
 		}
 	}
 }

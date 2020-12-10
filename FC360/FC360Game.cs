@@ -91,9 +91,6 @@
 
 		protected override void Update(GameTime gameTime)
 		{
-			if (GamePad.GetState(PlayerIndex.One).Buttons.Back == XnaButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-				Exit();
-
 			var currKBState = Keyboard.GetState();
 
 			_fc.Mem.InputBuffer.Previous = _fc.Mem.InputBuffer.Current;
@@ -102,7 +99,8 @@
 				down: KeyStateToFCButtonState(currKBState, Keys.Down),
 				left: KeyStateToFCButtonState(currKBState, Keys.Left),
 				right: KeyStateToFCButtonState(currKBState, Keys.Right),
-				enter: KeyStateToFCButtonState(currKBState, Keys.Enter)
+				enter: KeyStateToFCButtonState(currKBState, Keys.Enter),
+				escape: KeyStateToFCButtonState(currKBState, Keys.Escape)
 				);
 
 			_fc.Tick(gameTime.ElapsedGameTime.TotalMilliseconds);
@@ -115,6 +113,26 @@
 				LaunchBrowser(url);
 			}
 			_editModeStarted = _fc.Mem.EditMode;
+
+			var fsIntTbl = _fc.Mem.FileSystemBuffer.InterruptTable;
+			for (var i = 0; i < fsIntTbl.Length; i++)
+			{
+				var interrupt = fsIntTbl[i];
+				if (interrupt.Complete)
+					continue;
+
+				switch (interrupt.Code)
+				{
+					case FileSystemInterruptCode.GetFiles:
+						_fc.Mem.FileSystemBuffer.CompleteInterupt(i, new[]
+						{
+							"GAME 1",
+							"GAME 2",
+							"GAME 3"
+						});
+						break;
+				}
+			}
 		}
 
 		private static FCButtonState KeyStateToFCButtonState(KeyboardState keyboardState, Keys key)
