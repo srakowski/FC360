@@ -36,7 +36,9 @@
 
 		public InputBuffer InputBuffer { get; }
 
-		// GAME DATA
+		// GAME
+
+		public bool EditMode { get; set; }
 
 		public string ActiveGame { get; set; }
 

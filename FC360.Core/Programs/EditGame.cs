@@ -6,6 +6,11 @@
 		{
 		}
 
+		public override void Init()
+		{
+			Api.OpenGameEditor();
+		}
+
 		public override void Update(double deltaInMS)
 		{
 		}

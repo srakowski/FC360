@@ -1,12 +1,17 @@
 ﻿namespace FC360
 {
 	using FC360.Core;
+	using FC360.EditorApi;
+	using Microsoft.AspNetCore.Hosting;
+	using Microsoft.Extensions.DependencyInjection;
+	using Microsoft.Extensions.Hosting;
 	using Microsoft.Xna.Framework;
 	using Microsoft.Xna.Framework.Graphics;
 	using Microsoft.Xna.Framework.Input;
-	using XnaButtonState = Microsoft.Xna.Framework.Input.ButtonState;
-	using FCButtonState = Core.ButtonState;
 	using System.Diagnostics;
+	using System.Runtime.InteropServices;
+	using FCButtonState = Core.ButtonState;
+	using XnaButtonState = Microsoft.Xna.Framework.Input.ButtonState;
 
 	public class FC360Game : Game
 	{
@@ -16,6 +21,7 @@
 		private Color[] _pixelData;
 		private FantasyConsole _fc;
 		private ViewportAdapter _vpa;
+		private bool _editModeStarted;
 
 		public FC360Game()
 		{
@@ -45,6 +51,19 @@
 			_pixelData = new Color[_fc.Mem.DisplayBuffer.Width * _fc.Mem.DisplayBuffer.Height];
 
 			Window.TextInput += Window_TextInput;
+
+			var url = "http://localhost:8080";
+			Host.CreateDefaultBuilder(new string[] { })
+				.ConfigureWebHostDefaults(webBuilder =>
+				{
+					webBuilder.UseStartup<Startup>();
+					webBuilder.UseUrls(url);
+					webBuilder.ConfigureServices(s =>
+					{
+						s.AddSingleton(_ => _fc);
+					});
+				})
+				.RunConsoleAsync();
 
 			// Testing implementation, TODO: delete
 			//_fc.Mem.DisplayBuffer[20, 20] = 7;
@@ -89,6 +108,13 @@
 			_fc.Tick(gameTime.ElapsedGameTime.TotalMilliseconds);
 
 			_fc.Mem.InputBuffer.Text.Clear();
+
+			if (_fc.Mem.EditMode && !_editModeStarted)
+			{
+				var url = "http://localhost:8080";
+				LaunchBrowser(url);
+			}
+			_editModeStarted = _fc.Mem.EditMode;
 		}
 
 		private static FCButtonState KeyStateToFCButtonState(KeyboardState keyboardState, Keys key)
@@ -115,6 +141,26 @@
 			_spriteBatch.Begin(transformMatrix: _vpa.GetScaleMatrix(), samplerState: SamplerState.PointClamp);
 			_spriteBatch.Draw(_renderTarget, Vector2.Zero, Color.White);
 			_spriteBatch.End();
+		}
+
+		private static void LaunchBrowser(string url)
+		{
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+			{
+				Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+			}
+			else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+			{
+				Process.Start("xdg-open", url);
+			}
+			else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+			{
+				Process.Start("open", url);
+			}
+			else
+			{
+				// throw 
+			}
 		}
 	}
 }

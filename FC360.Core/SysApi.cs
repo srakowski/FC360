@@ -34,5 +34,10 @@ namespace FC360.Core
 			_fc.Mem.SpriteBuffer.Clear();
 			_fc.Mem.CodeBuffer.Clear();
 		}
+
+		public void OpenGameEditor()
+		{
+			_fc.Mem.EditMode = true;
+		}
 	}
 }
