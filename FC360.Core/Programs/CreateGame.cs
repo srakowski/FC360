@@ -39,11 +39,19 @@
 			}
 		}
 
+		public override void Resume(object returnParam)
+		{
+			if (returnParam is Promise<string> writeFile)
+			{
+				Sys.ExitProgram();
+				Sys.RunProgram(new GameMenu(Sys, writeFile.Result, InitialGameMode.Edit));
+			}
+		}
+
 		private void CreateGameWithName(string gameName)
 		{
-			Sys.LoadGame(gameName);
-			Sys.ExitProgram();
-			Sys.RunProgram(new GameMenu(Sys, InitialGameMode.Edit));
+			var writeFile = Sys.FS.WriteFile(gameName, new byte[] { });
+			Sys.RunProgram(new Await(Sys, writeFile));
 		}
 
 		public override void Draw()

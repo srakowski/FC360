@@ -13,6 +13,8 @@
 
 		public virtual void Init() { }
 
+		public virtual void Resume(object returnParam) { }
+
 		public abstract void Update(double deltaInMS);
 
 		public abstract void Draw();

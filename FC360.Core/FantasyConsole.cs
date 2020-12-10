@@ -22,7 +22,7 @@
 
 		public void PowerOn()
 		{
-			PushProgram(new Programs.Boot(_sys));
+			PushProgram(new Programs.RootMenu(_sys));
 		}
 
 		internal void PushProgram(Program prog)
@@ -31,9 +31,15 @@
 			prog.Init();
 		}
 
-		internal void PopProgram()
+		internal void PopProgram(object returnParam)
 		{
 			_programStack.Pop();
+			if (_programStack.Count > 0)
+			{
+				_programStack
+					.Peek()
+					.Resume(returnParam);
+			}
 		}
 
 		public void Tick(double deltaInMS)

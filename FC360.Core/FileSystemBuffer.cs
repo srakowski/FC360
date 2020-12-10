@@ -1,19 +1,20 @@
-﻿using System;
-
-namespace FC360.Core
+﻿namespace FC360.Core
 {
 	public enum FileSystemInterruptCode : byte
 	{
 		Noop,
 		GetFiles,
+		WriteFile,
+		ReadFile,
 	}
 
 	public struct FileSystemInterrupt
 	{
 		public FileSystemInterruptCode Code;
-		public bool Complete;
+		public string FileName;
 		public short BufferIdx;
 		public short BufferLen;
+		public bool Complete;
 	}
 
 	public class FileSystemBuffer
@@ -30,14 +31,27 @@ namespace FC360.Core
 
 		public FileSystemInterrupt[] InterruptTable => _interruptTable;
 
-		public int Interrupt(FileSystemInterruptCode code)
+		public int Interrupt(
+			FileSystemInterruptCode code,
+			string fileName = null,
+			string[] data = null
+			)
 		{
+			if (data != null)
+			{
+				for (var i = 0; i < data.Length; i++)
+				{
+					_data[i] = data[i];
+				}
+			}
+
 			_interruptTable[0] = new FileSystemInterrupt
 			{
 				Code = code,
-				Complete = false,
+				FileName = fileName,
 				BufferIdx = 0,
-				BufferLen = 0
+				BufferLen = (short)(data?.Length ?? 0),
+				Complete = false
 			};
 			return 0;
 		}

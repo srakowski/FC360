@@ -114,6 +114,9 @@
 
 		public MenuSelection Update(Menu menu)
 		{
+			if (menu is null)
+				return MenuSelection.None();
+
 			if (_inputApi.ButtonWasPressed(Button.Left))
 			{
 				menu.SelectLeft();
@@ -148,6 +151,9 @@
 		public void Draw(Menu menu)
 		{
 			_textApi.Clear();
+
+			if (menu is null)
+				return;
 
 			_textApi.Output(0, 0, menu.Title);
 			_textApi.InvertRange(0, 0, _textApi.BufferWidth, 1);

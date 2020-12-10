@@ -8,14 +8,24 @@
 		private string[] _gameFiles;
 		private Menu _menu;
 
-		public RootMenu(SysDriver api, string[] gameFiles) : base(api)
-		{
-			_gameFiles = gameFiles;
-		}
+		public RootMenu(SysDriver api) : base(api) { }
 
 		public override void Init()
 		{
-			_menu = CreateMenu(_gameFiles);
+			BeginFileRefresh();
+		}
+
+		public override void Resume(object returnParam)
+		{
+			if (returnParam is Promise<string[]> getFiles)
+			{
+				_gameFiles = getFiles.Result;
+				_menu = CreateMenu(_gameFiles);
+			}
+			else
+			{
+				BeginFileRefresh();
+			}
 		}
 
 		public override void Update(double deltaInMS)
@@ -25,7 +35,7 @@
 			{
 				case 0: // GAMES
 					var gameFileName = _gameFiles[selection.MenuOptionIdx];
-					LoadGame(gameFileName);
+					LoadGameMenu(gameFileName);
 					break;
 
 				case 1: // NEW
@@ -42,9 +52,15 @@
 			Sys.Menu.Draw(_menu);
 		}
 
-		private void LoadGame(string gameFileName)
+		private void BeginFileRefresh()
 		{
-			Sys.RunProgram(new GameLoader(Sys, gameFileName));
+			var getFiles = Sys.FS.GetFiles();
+			Sys.RunProgram(new Await(Sys, getFiles));
+		}
+
+		private void LoadGameMenu(string gameFileName)
+		{
+			Sys.RunProgram(new GameMenu(Sys, gameFileName));
 		}
 
 		private void CreateGame()

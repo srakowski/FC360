@@ -40,9 +40,9 @@
 			_fc.PushProgram(prog);
 		}
 
-		public void ExitProgram()
+		public void ExitProgram(object returnParam = null)
 		{
-			_fc.PopProgram();
+			_fc.PopProgram(returnParam);
 		}
 
 		public void LoadGame(string name, byte[] data = null)

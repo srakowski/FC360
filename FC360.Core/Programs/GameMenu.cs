@@ -11,36 +11,52 @@
 
 	class GameMenu : Program
 	{
-		private readonly InitialGameMode _mode;
+		private readonly string _gameFileName;
+		private InitialGameMode _mode;
 		private Menu _menu;
 
-		public GameMenu(SysDriver sys, InitialGameMode mode = InitialGameMode.Menu) : base(sys)
+		public GameMenu(
+			SysDriver sys,
+			string gameFileName,
+			InitialGameMode mode = InitialGameMode.Menu)
+			: base(sys)
 		{
+			_gameFileName = gameFileName;
 			_mode = mode;
 		}
 
 		public override void Init()
 		{
-			_menu = new Menu(
-			Sys.ActiveGameName,
-			new Tab("MENU",
-				new MenuOption("RUN"),
-				new MenuOption("EDIT"),
-				new MenuOption("EXIT")
-				)
-			);
+			var gameData = Sys.FS.ReadFile(_gameFileName);
+			Sys.RunProgram(new Await(Sys, gameData));
+		}
 
-			if (_mode == InitialGameMode.Edit)
+		public override void Resume(object returnParam)
+		{
+			if (returnParam is Promise<byte[]> gameData)
 			{
-				Sys.RunProgram(new EditGame(Sys));
-				return;
+				Sys.LoadGame(_gameFileName, gameData.Result);
+				if (_mode == InitialGameMode.Edit)
+				{
+					Sys.RunProgram(new EditGame(Sys));
+					_mode = InitialGameMode.Menu;
+				}
+
+				_menu = new Menu(
+				Sys.ActiveGameName,
+				new Tab("MENU",
+					new MenuOption("RUN"),
+					new MenuOption("EDIT"),
+					new MenuOption("EXIT")
+					)
+				);
 			}
 		}
 
 		public override void Update(double deltaInMS)
 		{
 			var selection = Sys.Menu.Update(_menu);
-			switch (selection.TabIdx)
+			switch (selection.MenuOptionIdx)
 			{
 				case 0: // RUN
 					break;
