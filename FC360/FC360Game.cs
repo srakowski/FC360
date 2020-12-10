@@ -4,6 +4,9 @@
 	using Microsoft.Xna.Framework;
 	using Microsoft.Xna.Framework.Graphics;
 	using Microsoft.Xna.Framework.Input;
+	using XnaButtonState = Microsoft.Xna.Framework.Input.ButtonState;
+	using FCButtonState = Core.ButtonState;
+	using System.Diagnostics;
 
 	public class FC360Game : Game
 	{
@@ -41,6 +44,8 @@
 
 			_pixelData = new Color[_fc.Mem.DisplayBuffer.Width * _fc.Mem.DisplayBuffer.Height];
 
+			Window.TextInput += Window_TextInput;
+
 			// Testing implementation, TODO: delete
 			//_fc.Mem.DisplayBuffer[20, 20] = 7;
 			//_fc.Mem.DisplayBuffer[10, 10] = 15;
@@ -55,6 +60,11 @@
 			//			init(10);
 		}
 
+		private void Window_TextInput(object sender, TextInputEventArgs e)
+		{
+			_fc.Mem.InputBuffer.Text.Append(e.Character);
+		}
+
 		protected override void LoadContent()
 		{
 			_spriteBatch = new SpriteBatch(GraphicsDevice);
@@ -62,10 +72,28 @@
 
 		protected override void Update(GameTime gameTime)
 		{
-			if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+			if (GamePad.GetState(PlayerIndex.One).Buttons.Back == XnaButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
 				Exit();
 
+			var currKBState = Keyboard.GetState();
+
+			_fc.Mem.InputBuffer.Previous = _fc.Mem.InputBuffer.Current;
+			_fc.Mem.InputBuffer.Current = new InputState(
+				up: KeyStateToFCButtonState(currKBState, Keys.Up),
+				down: KeyStateToFCButtonState(currKBState, Keys.Down),
+				left: KeyStateToFCButtonState(currKBState, Keys.Left),
+				right: KeyStateToFCButtonState(currKBState, Keys.Right),
+				enter: KeyStateToFCButtonState(currKBState, Keys.Enter)
+				);
+
 			_fc.Tick(gameTime.ElapsedGameTime.TotalMilliseconds);
+
+			_fc.Mem.InputBuffer.Text.Clear();
+		}
+
+		private static FCButtonState KeyStateToFCButtonState(KeyboardState keyboardState, Keys key)
+		{
+			return keyboardState.IsKeyDown(key) ? FCButtonState.Down : FCButtonState.Up;
 		}
 
 		protected override void Draw(GameTime gameTime)
@@ -74,7 +102,7 @@
 
 			var width = _fc.Mem.DisplayBuffer.Width;
 			for (var y = 0; y < _fc.Mem.DisplayBuffer.Height; y++)
-			{ 
+			{
 				for (var x = 0; x < width; x++)
 				{
 					var c = _fc.Mem.Pallete[_fc.Mem.DisplayBuffer[x, y]];

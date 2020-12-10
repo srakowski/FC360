@@ -36,9 +36,9 @@
 
 		public void InvertRange(int fromX, int fromY, int columnCount, int rowCount)
 		{
-			for (var y = fromY; y < rowCount; y++)
+			for (var y = fromY; y < fromY + rowCount; y++)
 			{
-				for (var x = fromX; x < columnCount; x++)
+				for (var x = fromX; x < fromX + columnCount; x++)
 				{
 					var cell = _textBuffer[x, y];
 					if (cell.Flags.HasFlag(CharCellFlag.Invert))

@@ -9,9 +9,16 @@
 			SysFont = new SysFont();
 			DisplayBuffer = new DisplayBuffer(width, height);
 			Pallete = new Pallete();
+
+			InputBuffer = new InputBuffer();
+
+			SpriteBuffer = new SpriteBuffer();
+			CodeBuffer = new CodeBuffer();
 		}
 
-		public DisplayMode DisplayMode { get; }
+		// GRAPHICS
+
+		public DisplayMode DisplayMode { get; set; }
 
 		public TextBuffer TextBuffer { get; }
 
@@ -24,5 +31,17 @@
 		public DisplayBuffer DisplayBuffer { get; }
 
 		public Pallete Pallete { get; }
+
+		// INPUT
+
+		public InputBuffer InputBuffer { get; }
+
+		// GAME DATA
+
+		public string ActiveGame { get; set; }
+
+		public SpriteBuffer SpriteBuffer { get; }
+
+		public CodeBuffer CodeBuffer { get; }
 	}
 }

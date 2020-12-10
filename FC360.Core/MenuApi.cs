@@ -2,6 +2,22 @@
 {
 	using System.Collections.Generic;
 
+	public struct MenuSelection
+	{
+		public MenuSelection(int tabIdx, int menuOptionIdx)
+		{
+			HasValue = tabIdx >= 0 && menuOptionIdx >= 0;
+			TabIdx = tabIdx;
+			MenuOptionIdx = menuOptionIdx;
+		}
+
+		public bool HasValue { get; }
+		public int TabIdx { get; }
+		public int MenuOptionIdx { get; }
+
+		internal static MenuSelection None() => new MenuSelection(-1, -1);
+	}
+
 	public class MenuOption
 	{
 		public MenuOption(string name)
@@ -14,45 +30,110 @@
 
 	public class Tab
 	{
-		private MenuOption[] _menuOptions;
+		private readonly MenuOption[] _menuOptions;
+		private int _selectedOptionIdx;
 
 		public Tab(string title, params MenuOption[] menuOptions)
 		{
 			Title = title;
 			_menuOptions = menuOptions;
-			SelectedMenuOption = menuOptions[0];
+			_selectedOptionIdx = 0;
 		}
 
 		public string Title { get; }
 
 		public IEnumerable<MenuOption> MenuOptions => _menuOptions;
 
-		public MenuOption SelectedMenuOption { get; private set; }
+		internal int SelectedMenuOptionIdx => _selectedOptionIdx;
+
+		internal MenuOption SelectedMenuOption => _menuOptions[_selectedOptionIdx];
+
+		internal void SelectUp()
+		{
+			_selectedOptionIdx--;
+			_selectedOptionIdx = _selectedOptionIdx < 0 ? _menuOptions.Length - 1 : _selectedOptionIdx;
+		}
+
+		internal void SelectDown()
+		{
+			_selectedOptionIdx++;
+			_selectedOptionIdx %= _menuOptions.Length;
+		}
 	}
 
 	public class Menu
 	{
+		private readonly Tab[] _tabs;
+		private int _selectedTabIndex;
+
 		public Menu(string title, params Tab[] tabs)
 		{
 			Title = title;
-			Tabs = tabs;
-			SelectedTab = tabs[0];
+			_tabs = tabs;
+			_selectedTabIndex = 0;
 		}
 
 		public string Title { get; }
 
-		public IEnumerable<Tab> Tabs { get; }
+		public IEnumerable<Tab> Tabs => _tabs;
 
-		public Tab SelectedTab { get; private set; }
+		internal int SelectedTabIdx => _selectedTabIndex;
+
+		internal Tab SelectedTab => _tabs[_selectedTabIndex];
+
+		internal void SelectLeft()
+		{
+			_selectedTabIndex--;
+			_selectedTabIndex = _selectedTabIndex < 0 ? _tabs.Length - 1 : _selectedTabIndex;
+		}
+
+		internal void SelectRight()
+		{
+			_selectedTabIndex++;
+			_selectedTabIndex %= _tabs.Length;
+		}
 	}
 
 	public class MenuApi
 	{
-		private TextApi _textApi;
+		private readonly InputApi _inputApi;
+		private readonly TextApi _textApi;
 
-		public MenuApi(TextApi textApi)
+		public MenuApi(InputApi inputApi, TextApi textApi)
 		{
+			_inputApi = inputApi;
 			_textApi = textApi;
+		}
+
+		public MenuSelection Update(Menu menu)
+		{
+			if (_inputApi.ButtonWasPressed(Button.Left))
+			{
+				menu.SelectLeft();
+			}
+			else if(_inputApi.ButtonWasPressed(Button.Right))
+			{
+				menu.SelectRight();
+			}
+
+			if (_inputApi.ButtonWasPressed(Button.Up))
+			{
+				menu.SelectedTab.SelectUp();
+			}
+			else if (_inputApi.ButtonWasPressed(Button.Down))
+			{
+				menu.SelectedTab.SelectDown();
+			}
+
+			if (_inputApi.ButtonWasPressed(Button.Enter))
+			{
+				return new MenuSelection(
+					menu.SelectedTabIdx,
+					menu.SelectedTab.SelectedMenuOptionIdx
+					);
+			}
+
+			return MenuSelection.None();
 		}
 
 		public void Draw(Menu menu)
@@ -77,12 +158,13 @@
 			var i = 0; 
 			foreach (var menuOption in menu.SelectedTab.MenuOptions)
 			{
-				var optionText = $"{i}:";
+				var optionText = $"{i + 1}:";
 				_textApi.Output(cursorX, cursorY, optionText, invert: menuOption == menu.SelectedTab.SelectedMenuOption);
 				cursorX += optionText.Length;
 				_textApi.Output(cursorX, cursorY, menuOption.Name);
 				i++;
 				cursorY++;
+				cursorX = 0;
 			}
 		}
 	}

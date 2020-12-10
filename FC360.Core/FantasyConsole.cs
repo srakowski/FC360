@@ -1,33 +1,40 @@
-﻿using System;
-
-namespace FC360.Core
+﻿namespace FC360.Core
 {
+	using System.Collections.Generic;
+
 	public class FantasyConsole
 	{
 		private const int DisplayWidth = 192;
 		private const int DisplayHeight = 128;
 
 		private SysApi _api;
-		private Program _program;
+		private Stack<Program> _programStack;
 
 		public FantasyConsole()
 		{
 			Mem = new Memory(DisplayWidth, DisplayHeight);
 			_api = new SysApi(this);
-			_program = new Programs.OperatingSystem(_api);
+			_programStack = new Stack<Program>();
 		}
 
 		public Memory Mem { get; }
 
 		public void PowerOn()
 		{
-			_program.Init();
+			PushProgram(new Programs.RootMenu(_api));
+		}
+
+		internal void PushProgram(Program prog)
+		{
+			_programStack.Push(prog);
+			prog.Init();
 		}
 
 		public void Tick(double deltaInMS)
 		{
-			_program.Update(deltaInMS);
-			_program.Draw();
+			// TODO: maybe not Peek() every time
+			_programStack.Peek().Update(deltaInMS);
+			_programStack.Peek().Draw();
 			if (Mem.DisplayMode == DisplayMode.Text)
 			{
 				CopyTextToDisplayBuffer();
