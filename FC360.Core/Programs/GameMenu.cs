@@ -29,7 +29,7 @@
 		{
 			var gameData = Sys.FS.ReadFile(_gameFileName);
 			
-			Sys.LoadGame(_gameFileName, gameData);
+			Sys.Game.Load(_gameFileName, gameData);
 
 			_menu = new Menu(
 				_gameFileName,
@@ -53,6 +53,7 @@
 			switch (selection.MenuOptionIdx)
 			{
 				case 0: // RUN
+					Sys.RunProgram(new GameRuntime(Sys));
 					break;
 
 				case 1: // EDIT

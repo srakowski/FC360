@@ -67,15 +67,6 @@
 			// Testing implementation, TODO: delete
 			//_fc.Mem.DisplayBuffer[20, 20] = 7;
 			//_fc.Mem.DisplayBuffer[10, 10] = 15;
-
-			//			var engine = Python.CreateEngine();
-			//			var scope = engine.CreateScope();
-			//			engine.Execute(
-			//@"def Init(val):
-			//	print 'Hello World!' + str(val)
-			//", scope);
-			//			var init = scope.GetVariable("Init");
-			//			init(10);
 		}
 
 		private void Window_TextInput(object sender, TextInputEventArgs e)

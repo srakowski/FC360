@@ -13,7 +13,7 @@
 			InputBuffer = new InputBuffer();
 
 			SpriteBuffer = new SpriteBuffer();
-			CodeBuffer = new CodeBuffer();
+			CodeBuffer = string.Empty;
 		}
 
 		// GRAPHICS
@@ -45,6 +45,6 @@
 
 		public SpriteBuffer SpriteBuffer { get; }
 
-		public CodeBuffer CodeBuffer { get; }
+		public string CodeBuffer { get; set; }
 	}
 }

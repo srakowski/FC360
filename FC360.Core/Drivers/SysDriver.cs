@@ -15,6 +15,7 @@
 			_drivers.Add(Input = new InputDriver(_fc.Mem.InputBuffer));
 			_drivers.Add(Console = new ConsoleDriver(_fc.Mem.TextBuffer));
 			_drivers.Add(Menu = new MenuDriver(Input, Console));
+			_drivers.Add(Game = new GameDriver(this, _fc.Mem));
 		}
 
 		public FileSystemDriver FS { get; }
@@ -24,6 +25,8 @@
 		public ConsoleDriver Console { get; }
 
 		public MenuDriver Menu { get; }
+
+		public GameDriver Game { get; }
 
 		public string ActiveGameName => _fc.Mem.ActiveGame;
 
@@ -49,17 +52,6 @@
 		public void ExitProgram(object returnParam = null)
 		{
 			_fc.PopProgram(returnParam);
-		}
-
-		public void LoadGame(string name, byte[] data = null)
-		{
-			_fc.Mem.ActiveGame = name;
-			_fc.Mem.SpriteBuffer.Clear();
-			_fc.Mem.CodeBuffer.Clear();
-			if (data != null)
-			{
-				// TODO: Parse data load into Sprite & Code spaces
-			}
 		}
 
 		public void OpenGameEditor()
