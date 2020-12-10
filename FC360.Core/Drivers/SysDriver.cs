@@ -11,7 +11,7 @@
 		{
 			_fc = fc;
 			_drivers = new List<Driver>();
-			_drivers.Add(FS = new FileSystemDriver(_fc.Mem.FileSystemBuffer));
+			_drivers.Add(FS = new FileSystemDriver());
 			_drivers.Add(Input = new InputDriver(_fc.Mem.InputBuffer));
 			_drivers.Add(Console = new ConsoleDriver(_fc.Mem.TextBuffer));
 			_drivers.Add(Menu = new MenuDriver(Input, Console));
@@ -37,6 +37,12 @@
 
 		public void RunProgram(Program prog)
 		{
+			_fc.PushProgram(prog);
+		}
+
+		public void SwapProgram(Program prog)
+		{
+			_fc.PopProgram(null);
 			_fc.PushProgram(prog);
 		}
 

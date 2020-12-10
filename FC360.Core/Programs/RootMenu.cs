@@ -12,20 +12,12 @@
 
 		public override void Init()
 		{
-			BeginFileRefresh();
+			RefreshMenu();
 		}
 
 		public override void Resume(object returnParam)
 		{
-			if (returnParam is Promise<string[]> getFiles)
-			{
-				_gameFiles = getFiles.Result;
-				_menu = CreateMenu(_gameFiles);
-			}
-			else
-			{
-				BeginFileRefresh();
-			}
+			RefreshMenu();
 		}
 
 		public override void Update(double deltaInMS)
@@ -43,6 +35,7 @@
 					break;
 
 				case 2: // SYS
+					Sys.ExitProgram();
 					break;
 			}
 		}
@@ -52,10 +45,10 @@
 			Sys.Menu.Draw(_menu);
 		}
 
-		private void BeginFileRefresh()
+		private void RefreshMenu()
 		{
-			var getFiles = Sys.FS.GetFiles();
-			Sys.RunProgram(new Await(Sys, getFiles));
+			_gameFiles = Sys.FS.GetFiles();
+			_menu = CreateMenu(_gameFiles);
 		}
 
 		private void LoadGameMenu(string gameFileName)

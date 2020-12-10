@@ -14,8 +14,6 @@
 
 			SpriteBuffer = new SpriteBuffer();
 			CodeBuffer = new CodeBuffer();
-
-			FileSystemBuffer = new FileSystemBuffer();
 		}
 
 		// GRAPHICS
@@ -48,9 +46,5 @@
 		public SpriteBuffer SpriteBuffer { get; }
 
 		public CodeBuffer CodeBuffer { get; }
-
-		// FILE SYSTEM
-
-		public FileSystemBuffer FileSystemBuffer { get; }
 	}
 }

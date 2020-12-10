@@ -2,6 +2,7 @@
 {
 	using FC360.Core.Drivers;
 	using System.Collections.Generic;
+	using System.Linq;
 
 	public class FantasyConsole
 	{
@@ -25,6 +26,8 @@
 			PushProgram(new Programs.RootMenu(_sys));
 		}
 
+		public bool IsRunning => _programStack.Any();
+
 		internal void PushProgram(Program prog)
 		{
 			_programStack.Push(prog);
@@ -46,9 +49,9 @@
 		{
 			_sys.Update(deltaInMS);
 
-			// TODO: maybe not Peek() every time, store current prog?
-			_programStack.Peek().Update(deltaInMS);
-			_programStack.Peek().Draw();
+			var prog = _programStack.Peek();
+			prog.Update(deltaInMS);
+			prog.Draw();
 
 			if (Mem.DisplayMode == DisplayMode.Text)
 			{

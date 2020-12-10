@@ -7,9 +7,7 @@
 	{
 		private StringBuilder _nameBuffer = new StringBuilder();
 
-		public CreateGame(SysDriver api) : base(api)
-		{
-		}
+		public CreateGame(SysDriver api) : base(api) { }
 
 		public override void Update(double deltaInMS)
 		{
@@ -39,19 +37,10 @@
 			}
 		}
 
-		public override void Resume(object returnParam)
-		{
-			if (returnParam is Promise<string> writeFile)
-			{
-				Sys.ExitProgram();
-				Sys.RunProgram(new GameMenu(Sys, writeFile.Result, InitialGameMode.Edit));
-			}
-		}
-
 		private void CreateGameWithName(string gameName)
 		{
-			var writeFile = Sys.FS.WriteFile(gameName, new byte[] { });
-			Sys.RunProgram(new Await(Sys, writeFile));
+			Sys.FS.WriteFile(gameName, new byte[] { });
+			Sys.SwapProgram(new GameMenu(Sys, gameName, InitialGameMode.Edit));
 		}
 
 		public override void Draw()

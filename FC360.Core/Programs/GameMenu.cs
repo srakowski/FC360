@@ -28,28 +28,22 @@
 		public override void Init()
 		{
 			var gameData = Sys.FS.ReadFile(_gameFileName);
-			Sys.RunProgram(new Await(Sys, gameData));
-		}
+			
+			Sys.LoadGame(_gameFileName, gameData);
 
-		public override void Resume(object returnParam)
-		{
-			if (returnParam is Promise<byte[]> gameData)
-			{
-				Sys.LoadGame(_gameFileName, gameData.Result);
-				if (_mode == InitialGameMode.Edit)
-				{
-					Sys.RunProgram(new EditGame(Sys));
-					_mode = InitialGameMode.Menu;
-				}
-
-				_menu = new Menu(
-				Sys.ActiveGameName,
+			_menu = new Menu(
+				_gameFileName,
 				new Tab("MENU",
 					new MenuOption("RUN"),
 					new MenuOption("EDIT"),
 					new MenuOption("EXIT")
 					)
 				);
+
+			if (_mode == InitialGameMode.Edit)
+			{
+				Sys.RunProgram(new EditGame(Sys));
+				_mode = InitialGameMode.Menu;
 			}
 		}
 

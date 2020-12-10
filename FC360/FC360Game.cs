@@ -9,11 +9,8 @@
 	using Microsoft.Xna.Framework.Graphics;
 	using Microsoft.Xna.Framework.Input;
 	using System.Diagnostics;
-	using System.IO;
-	using System.Linq;
 	using System.Runtime.InteropServices;
 	using FCButtonState = Core.ButtonState;
-	using XnaButtonState = Microsoft.Xna.Framework.Input.ButtonState;
 
 	public class FC360Game : Game
 	{
@@ -116,42 +113,9 @@
 			}
 			_editModeStarted = _fc.Mem.EditMode;
 
-			var fsIntTbl = _fc.Mem.FileSystemBuffer.InterruptTable;
-			for (var i = 0; i < fsIntTbl.Length; i++)
+			if (!_fc.IsRunning)
 			{
-				var interrupt = fsIntTbl[i];
-				if (interrupt.Complete)
-					continue;
-
-				switch (interrupt.Code)
-				{
-					case FileSystemInterruptCode.GetFiles:
-						var files = Directory
-							.GetFiles(".", "*.fcgame")
-							.Select(Path.GetFileNameWithoutExtension)
-							.ToArray();
-
-						_fc.Mem.FileSystemBuffer.CompleteInterupt(i, files);
-						break;
-
-					case FileSystemInterruptCode.WriteFile:
-						var writeData = _fc.Mem.FileSystemBuffer
-							.GetData(interrupt.BufferIdx, interrupt.BufferLen)
-							.First();
-
-						File.WriteAllText(interrupt.FileName + ".fcgame", writeData);
-
-						_fc.Mem.FileSystemBuffer.CompleteInterupt(i, new string[] { });
-						break;
-
-					case FileSystemInterruptCode.ReadFile:
-						var readData = File.ReadAllText(interrupt.FileName + ".fcgame");
-						_fc.Mem.FileSystemBuffer.CompleteInterupt(i, new string[]
-						{
-							readData
-						});
-						break;
-				}
+				Exit();
 			}
 		}
 
