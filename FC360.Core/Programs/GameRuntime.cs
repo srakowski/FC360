@@ -16,6 +16,12 @@
 
 		public override void Update(double deltaInMS)
 		{
+			if (Sys.Input.ButtonWasPressed(Button.Escape))
+			{
+				Sys.ExitProgram();
+				return;
+			}
+
 			_game.Update(deltaInMS);
 		}
 

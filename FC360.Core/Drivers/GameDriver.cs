@@ -1,6 +1,7 @@
 ﻿namespace FC360.Core.Drivers
 {
 	using IronPython.Hosting;
+	using Microsoft.Scripting.Hosting;
 	using System;
 	using System.Text;
 
@@ -24,11 +25,13 @@
 
 	public class GameDriver : Driver
 	{
+		private ScriptEngine _engine;
 		private SysDriver _sys;
 		private Memory _mem;
 
 		public GameDriver(SysDriver sys, Memory mem)
 		{
+			_engine = Python.CreateEngine();
 			_sys = sys;
 			_mem = mem;
 		}
@@ -46,15 +49,36 @@
 
 		public Game Execute()
 		{
-			var engine = Python.CreateEngine();
-			var scope = engine.CreateScope();
+			var scope = _engine.CreateScope();
+
+			_engine.Execute(
+				"import clr\n" +
+				"from System import Array\n" +
+				"clr.AddReference('FC360.Core')\n" +
+				"from FC360.Core.Drivers import Menu, Tab, MenuOption, MenuSelection\n",
+				scope
+			);
+
 			scope.SetVariable("clear", new Action(_sys.Console.Clear));
 			scope.SetVariable("output", new Action<int, int, string, bool>(_sys.Console.Output));
+			scope.SetVariable("menu_update", new Func<Menu, MenuSelection>(_sys.Menu.Update));
+			scope.SetVariable("menu_draw", new Action<Menu>(_sys.Menu.Draw));
 
-			engine.Execute(_mem.CodeBuffer, scope);
-			var init = scope.GetVariable("init");
-			var update = scope.GetVariable("update");
-			var draw = scope.GetVariable("draw");
+			_engine.CreateScriptSourceFromString(_mem.CodeBuffer)
+				.Execute(scope);
+
+			var init = scope.TryGetVariable<Action>("init", out var initFn)
+				? initFn
+				: new Action(() => { });
+
+			var update = scope.TryGetVariable<Action<double>>("update", out var updateFn)
+				? updateFn
+				: new Action<double>(_ => { });
+
+			var draw = scope.TryGetVariable<Action>("draw", out var drawFn)
+				? drawFn
+				: new Action(() => { });
+
 			return new Game(
 				() => init(),
 				d => update(d),
