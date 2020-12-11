@@ -28,7 +28,7 @@
 
 		public GameDriver Game { get; }
 
-		public string ActiveGameName => _fc.Mem.ActiveGame;
+		public string ActiveGameName => _fc.Mem.ActiveGameName;
 
 		public override void Update(double deltaTimeMS)
 		{

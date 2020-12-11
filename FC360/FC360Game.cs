@@ -99,7 +99,7 @@
 
 			if (_fc.Mem.EditMode && !_editModeStarted)
 			{
-				var url = "http://localhost:8080";
+				var url = "http://localhost:8080/api/fc360";
 				LaunchBrowser(url);
 			}
 			_editModeStarted = _fc.Mem.EditMode;

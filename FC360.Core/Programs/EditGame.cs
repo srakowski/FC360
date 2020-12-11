@@ -27,7 +27,7 @@
 			Sys.Console.Output(0, 0, $"EDIT {Sys.ActiveGameName}");
 			Sys.Console.InvertRange(0, 0, Sys.Console.BufferWidth, 1);
 			Sys.Console.Output(2, 6, "Edit at:");
-			Sys.Console.Output(2, 7, "http://localhost:8080");
+			Sys.Console.Output(2, 7, "http://localhost:8080/api/fc360");
 			Sys.Console.Output(0, Sys.Console.BufferHeight - 1, "[ESC] Return");
 		}
 	}

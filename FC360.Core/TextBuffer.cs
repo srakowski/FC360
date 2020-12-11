@@ -38,7 +38,16 @@
 		public CharCell this[int x, int y]
 		{
 			get => _data[x, y];
-			set => _data[x, y] = value;
+			set
+			{
+				if (x < 0 || x >= Width ||
+					y < 0 || y >= Height)
+				{
+					return;
+				}
+
+				_data[x, y] = value;
+			}
 		}
 
 		public int Width => _data.GetLength(0);

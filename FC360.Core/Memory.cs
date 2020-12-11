@@ -41,7 +41,7 @@
 		// TODO: convert to "interrupt" code
 		public bool EditMode { get; set; }
 
-		public string ActiveGame { get; set; }
+		public string ActiveGameName { get; set; }
 
 		public SpriteBuffer SpriteBuffer { get; }
 

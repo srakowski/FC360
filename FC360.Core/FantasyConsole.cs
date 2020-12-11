@@ -9,21 +9,22 @@
 		private const int DisplayWidth = 192;
 		private const int DisplayHeight = 128;
 
-		private SysDriver _sys;
 		private Stack<Program> _programStack;
 
 		public FantasyConsole()
 		{
 			Mem = new Memory(DisplayWidth, DisplayHeight);
-			_sys = new SysDriver(this);
+			Sys = new SysDriver(this);
 			_programStack = new Stack<Program>();
 		}
 
 		public Memory Mem { get; }
 
+		public SysDriver Sys { get; }
+
 		public void PowerOn()
 		{
-			PushProgram(new Programs.RootMenu(_sys));
+			PushProgram(new Programs.RootMenu(Sys));
 		}
 
 		public bool IsRunning => _programStack.Any();
@@ -47,7 +48,7 @@
 
 		public void Tick(double deltaInMS)
 		{
-			_sys.Update(deltaInMS);
+			Sys.Update(deltaInMS);
 
 			var prog = _programStack.Peek();
 			prog.Update(deltaInMS);

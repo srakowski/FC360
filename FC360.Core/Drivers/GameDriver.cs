@@ -2,6 +2,7 @@
 {
 	using IronPython.Hosting;
 	using System;
+	using System.Text;
 
 	public class Game
 	{
@@ -34,23 +35,12 @@
 
 		public void Load(string name, byte[] data = null)
 		{
-			_mem.ActiveGame = name;
+			_mem.ActiveGameName = name;
 			_mem.SpriteBuffer.Clear();
 			_mem.CodeBuffer = string.Empty;
 			if (data != null)
 			{
-				_mem.CodeBuffer =
-@"
-def init():
-	print 'Hello'
-
-def update(delta):
-	pass
-
-def draw():
-	clear()
-	output(0, 0, 'Hello World!', False)
-";
+				_mem.CodeBuffer = Encoding.ASCII.GetString(data);
 			}
 		}
 
@@ -70,6 +60,12 @@ def draw():
 				d => update(d),
 				() => draw()
 			);
+		}
+
+		public void Save()
+		{
+			var code = Encoding.ASCII.GetBytes(_mem.CodeBuffer);
+			_sys.FS.WriteFile(_mem.ActiveGameName, code);
 		}
 	}
 }
