@@ -1,4 +1,6 @@
-﻿namespace FC360.Core
+﻿using System;
+
+namespace FC360.Core
 {
 	public class DisplayBuffer
 	{
@@ -18,5 +20,14 @@
 		public int Width => _data.GetLength(0);
 
 		public int Height => _data.GetLength(1);
+
+		internal void Clear()
+		{
+			for (var x = 0; x < _data.GetLength(0); x++)
+				for (var y = 0; y < _data.GetLength(1); y++)
+				{
+					this[x, y] = 0;
+				}
+		}
 	}
 }

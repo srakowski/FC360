@@ -4,6 +4,7 @@
 	using FC360.EditorApi.Models;
 	using Microsoft.AspNetCore.Mvc;
 	using System.Collections.Generic;
+	using System.Linq;
 	using System.Net.Http;
 
 	[Route("api/fc360/game")]
@@ -26,6 +27,7 @@
 				{
 					{ "parent", FC360Controller.GetRootLink() },
 					{ "self", GetGameLink() },
+					{ "game.sprites", GetAllGameSpritesLink() },
 					{ "game.code", GetGameCodeLink() },
 				}));
 		}
@@ -63,6 +65,55 @@
 			return Redirect(GetGameCodeLink().Href);
 		}
 
+		[HttpGet("sprites")]
+		public ActionResult<AllGameSpritesDto> GetAllGameSprites([FromServices] FantasyConsole fc)
+		{
+			if (!IsGetGameAvailable(fc))
+			{
+				return NotFound();
+			}
+
+			return Ok(new AllGameSpritesDto(
+				fc.Mem.SpriteBuffer.Sprites.Select(s => s.Select(b => (int)b).ToArray()).ToArray(),
+				new Dictionary<string, LinkDto>
+				{
+					{ "parent", GetGameLink() },
+					{ "self", GetAllGameSpritesLink() },
+					{ "sprite[i]", GetGameSpriteLink(":i") },
+				}));
+		}
+
+		[HttpGet("sprites/{i}")]
+		public ActionResult<GameSpriteDto> GetGameSprite(int i, [FromServices] FantasyConsole fc)
+		{
+			if (!IsGetGameAvailable(fc))
+			{
+				return NotFound();
+			}
+
+			return Ok(new GameSpriteDto(
+				fc.Mem.SpriteBuffer[(byte)i].Select(b => (int)b).ToArray(),
+				new Dictionary<string, LinkDto>
+				{
+					{ "parent", GetAllGameSpritesLink() },
+					{ "self", GetGameSpriteLink(i.ToString()) }
+				}));
+		}
+
+		[HttpPut("sprites/{i}")]
+		public ActionResult<GameSpriteDto> PutGameSprite(int i, [FromBody] GameSpriteDto dto, [FromServices] FantasyConsole fc)
+		{
+			if (!IsGetGameAvailable(fc))
+			{
+				return NotFound();
+			}
+
+			fc.Mem.SpriteBuffer[(byte)i] = new Sprite(dto.Data.Select(i => (byte)i).ToArray());
+			fc.Sys.Game.Save();
+
+			return Redirect(GetGameSpriteLink(i.ToString()).Href);
+		}
+
 		public static bool IsGetGameAvailable(FantasyConsole fc)
 		{
 			var gameName = fc.Mem.ActiveGameName;
@@ -75,7 +126,10 @@
 		public static LinkDto GetGameCodeLink() =>
 			new LinkDto(HttpMethod.Get.Method, "/api/fc360/game/code");
 
-		public static LinkDto PutGameCodeLink() =>
-			new LinkDto(HttpMethod.Put.Method, "/api/fc360/game/code");
+		public static LinkDto GetAllGameSpritesLink() =>
+			new LinkDto(HttpMethod.Get.Method, "/api/fc360/game/sprites");
+
+		public static LinkDto GetGameSpriteLink(string i) =>
+			new LinkDto(HttpMethod.Get.Method, $"/api/fc360/game/sprites/{i}");
 	}
 }

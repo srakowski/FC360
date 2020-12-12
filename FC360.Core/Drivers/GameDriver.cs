@@ -3,7 +3,11 @@
 	using IronPython.Hosting;
 	using Microsoft.Scripting.Hosting;
 	using System;
+	using System.Linq;
 	using System.Text;
+	using System.Text.Json;
+
+	public record GameData(byte[][] Sprites, string Code);
 
 	public class Game
 	{
@@ -36,17 +40,6 @@
 			_mem = mem;
 		}
 
-		public void Load(string name, byte[] data = null)
-		{
-			_mem.ActiveGameName = name;
-			_mem.SpriteBuffer.Clear();
-			_mem.CodeBuffer = string.Empty;
-			if (data != null)
-			{
-				_mem.CodeBuffer = Encoding.ASCII.GetString(data);
-			}
-		}
-
 		public Game Execute()
 		{
 			var scope = _engine.CreateScope();
@@ -59,10 +52,14 @@
 				scope
 			);
 
-			scope.SetVariable("clear", new Action(_sys.Console.Clear));
+			scope.SetVariable("clear_text", new Action(_sys.Console.Clear));
 			scope.SetVariable("output", new Action<int, int, string, bool>(_sys.Console.Output));
 			scope.SetVariable("menu_update", new Func<Menu, MenuSelection>(_sys.Menu.Update));
 			scope.SetVariable("menu_draw", new Action<Menu>(_sys.Menu.Draw));
+			scope.SetVariable("spr", new Action<byte, int, int>(_sys.Graphics.DrawSprite));
+			scope.SetVariable("clear_graph", new Action(_sys.Graphics.Clear));
+			scope.SetVariable("graphics_mode", new Action(_sys.Graphics.GraphicsMode));
+			scope.SetVariable("text_mode", new Action(_sys.Graphics.TextMode));
 
 			_engine.CreateScriptSourceFromString(_mem.CodeBuffer)
 				.Execute(scope);
@@ -86,10 +83,39 @@
 			);
 		}
 
+		public void Load(string name)
+		{
+			_mem.ActiveGameName = name;
+			_mem.SpriteBuffer.Clear();
+			_mem.CodeBuffer = string.Empty;
+
+			var rawGameData = _sys.FS.ReadFile(name);
+			if (rawGameData is null || rawGameData.Length == 0)
+			{
+				return;
+			}
+
+			var serializedGameData = Encoding.ASCII.GetString(rawGameData);
+			var gameData = JsonSerializer.Deserialize<GameData>(serializedGameData);
+			_mem.CodeBuffer = gameData.Code;
+			for (int i = 0; i < gameData.Sprites.Length; i++)
+			{
+				_mem.SpriteBuffer[(byte)i] = new Sprite(gameData.Sprites[i]);
+			}
+		}
+
 		public void Save()
 		{
-			var code = Encoding.ASCII.GetBytes(_mem.CodeBuffer);
-			_sys.FS.WriteFile(_mem.ActiveGameName, code);
+			var spriteData = _mem
+				.SpriteBuffer
+				.Sprites
+				.Select(s => s.ToArray())
+				.ToArray();
+
+			var gameData = new GameData(spriteData, _mem.CodeBuffer);
+			var serializedGameData = JsonSerializer.Serialize(gameData);
+			var rawGameData = Encoding.ASCII.GetBytes(serializedGameData);
+			_sys.FS.WriteFile(_mem.ActiveGameName, rawGameData);
 		}
 	}
 }

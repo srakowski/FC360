@@ -27,9 +27,7 @@
 
 		public override void Init()
 		{
-			var gameData = Sys.FS.ReadFile(_gameFileName);
-			
-			Sys.Game.Load(_gameFileName, gameData);
+			Sys.Game.Load(_gameFileName);
 
 			_menu = new Menu(
 				_gameFileName,

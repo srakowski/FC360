@@ -14,6 +14,7 @@
 			_drivers.Add(FS = new FileSystemDriver());
 			_drivers.Add(Input = new InputDriver(_fc.Mem.InputBuffer));
 			_drivers.Add(Console = new ConsoleDriver(_fc.Mem.TextBuffer));
+			_drivers.Add(Graphics = new GraphicsDriver(_fc.Mem));
 			_drivers.Add(Menu = new MenuDriver(Input, Console));
 			_drivers.Add(Game = new GameDriver(this, _fc.Mem));
 		}
@@ -23,6 +24,8 @@
 		public InputDriver Input { get; }
 
 		public ConsoleDriver Console { get; }
+
+		public GraphicsDriver Graphics { get; }
 
 		public MenuDriver Menu { get; }
 
